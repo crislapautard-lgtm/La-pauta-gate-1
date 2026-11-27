@@ -5,6 +5,38 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
+
+// Retardo fijo de N muestras. La puerta "escucha" la señal sin retardo y aplica
+// la ganancia sobre la señal retardada, así abre ANTES de que llegue el inicio
+// de la palabra y no se lo come.
+class LookaheadDelay
+{
+public:
+    void prepare (int delaySamples)
+    {
+        d = std::max (0, delaySamples);
+        buf.assign ((size_t) std::max (1, d), 0.0f);
+        pos = 0;
+    }
+
+    float process (float x) noexcept
+    {
+        if (d == 0)
+            return x;
+
+        const float y = buf[(size_t) pos];
+        buf[(size_t) pos] = x;
+        if (++pos >= d)
+            pos = 0;
+        return y;
+    }
+
+private:
+    std::vector<float> buf;
+    int d = 0;
+    int pos = 0;
+};
 
 struct GateParams
 {

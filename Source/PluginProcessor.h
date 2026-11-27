@@ -79,6 +79,7 @@ private:
     std::atomic<float>* pBypass  = nullptr;
 
     GateDSP dsp;
+    LookaheadDelay delays[2];   // retardo de 5 ms (lookahead) por canal
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GateProcessor)
 };
