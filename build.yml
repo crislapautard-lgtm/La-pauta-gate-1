@@ -1,0 +1,37 @@
+name: Compilar La Pauta Gate C1 (Windows) + Instalador
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar
+        run: cmake -S . -B build -A x64
+
+      - name: Compilar VST3
+        run: cmake --build build --config Release --target LaPautaGateC1_VST3 --parallel
+
+      - name: Instalar Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Crear instalador
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\LaPautaGateC1.iss'
+
+      - name: Subir instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: LaPauta-GateC1-Instalador
+          path: installer/output/LaPauta_GateC1_Setup.exe
+
+      - name: Subir VST3 (sin instalador)
+        uses: actions/upload-artifact@v4
+        with:
+          name: LaPauta-GateC1-VST3
+          path: build/LaPautaGateC1_artefacts/Release/VST3
